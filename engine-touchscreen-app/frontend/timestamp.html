@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Timestamp</title>
+    <link rel="stylesheet" href="./app.css" />
+    <style>
+      .timestamp-wrap {
+        max-width: 760px;
+        margin: 60px auto;
+        background: linear-gradient(145deg, #161616 0%, #1a1a1a 100%);
+        border: 1px solid #252525;
+        border-radius: 16px;
+        padding: 28px;
+        position: relative;
+        z-index: 1;
+      }
+      .timestamp-value {
+        font-size: 2rem;
+        color: #00A8E8;
+        font-weight: 800;
+        margin-top: 12px;
+        word-break: break-word;
+      }
+      .timestamp-meta {
+        margin-top: 10px;
+        color: #b8b8b8;
+      }
+      .timestamp-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      .btn {
+        background: #0081C9;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn:hover { background: #00A8E8; }
+      .status-good { color: #16c47f; }
+      .status-bad { color: #f24e1e; }
+    </style>
+  </head>
+  <body>
+    <div class="timestamp-wrap">
+      <h1>Live Database Timestamp</h1>
+      <p>API: <code>/api/live/timestamp</code></p>
+      <div id="timestampValue" class="timestamp-value">Loading...</div>
+      <div id="timestampMeta" class="timestamp-meta">Please wait...</div>
+      <div id="timestampError" class="danger-box" style="display:none;"></div>
+      <div class="timestamp-actions">
+        <button id="refreshBtn" class="btn">Refresh Now</button>
+        <a href="./index.html" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <script src="./timestamp.js"></script>
+  </body>
+</html>

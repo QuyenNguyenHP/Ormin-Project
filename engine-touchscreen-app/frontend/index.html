@@ -1,0 +1,32 @@
+﻿<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generator Analog Dashboard</title>
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="topbar-left">
+          <img class="drums-logo" src="./Asset/DRUMS%20logo.png" alt="DRUMS logo" />
+          <div>
+          <h1>Generator Analog Dashboard</h1>
+          <p id="sourceText">Source: http://localhost:8000/api/live/analog_lable_value</p>
+          </div>
+        </div>
+        <div class="status" id="statusBox">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Connecting...</span>
+          <small id="lastUpdated">--</small>
+        </div>
+      </header>
+
+      <p class="error" id="errorText"></p>
+      <main class="grid" id="grid"></main>
+    </div>
+
+    <script src="./index.js"></script>
+  </body>
+</html>

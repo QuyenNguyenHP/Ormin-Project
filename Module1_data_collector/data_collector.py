@@ -104,11 +104,11 @@ async def read_modbus_data_DG(DG, slave_id, dg_name, imo, serial):
             # ========== ANALOG ==========
             print(f"\n🧭 {dg_name} Analog Signal")
             analog_map = {
-                #0x01: (f"{dg_name} FUEL OIL TEMPERATURE ENGINE INLET", "deg C", 1),
-                #0x02: (f"{dg_name} BOOST AIR TEMPERATURE", "deg C", 1),
+                0x01: (f"{dg_name} FUEL OIL TEMPERATURE ENGINE INLET", "deg C", 1),
+                0x02: (f"{dg_name} BOOST AIR TEMPERATURE", "deg C", 1),
                 0x03: (f"{dg_name} LUB OIL TEMPERATURE ENGINE INLET", "deg C", 1),
                 0x04: (f"{dg_name} H.T. WATER TEMPERATURE ENGINE OUTLET", "deg C", 1),
-                #0x05: (f"{dg_name} H.T. WATER TEMPERATURE ENGINE INLET", "deg C", 1),
+                0x05: (f"{dg_name} H.T. WATER TEMPERATURE ENGINE INLET", "deg C", 1),
                 0x06: (f"{dg_name} No.1CYL. EXHAUST GAS TEMPERATURE", "deg C", 1),
                 0x07: (f"{dg_name} No.2CYL. EXHAUST GAS TEMPERATURE", "deg C", 1),
                 0x08: (f"{dg_name} No.3CYL. EXHAUST GAS TEMPERATURE", "deg C", 1),
@@ -357,8 +357,8 @@ async def main():
                     except Exception as e:
                         print(f"❌ Error reading {ip}: {e}")
                         traceback.print_exc()
-            print("\n⏱️ WAITING 2s")
-            await asyncio.sleep(2)
+            print("\n⏱️ WAITING 5s")
+            await asyncio.sleep(5)
 
     finally:
         print("🛑 Closing clients...")
