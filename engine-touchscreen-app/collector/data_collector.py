@@ -4,6 +4,8 @@ import traceback
 import csv
 import datetime
 import sqlite3
+import os
+from contextlib import nullcontext
 from pathlib import Path
 from pymodbus.client import AsyncModbusTcpClient
 
@@ -11,6 +13,7 @@ IMO_NO = "1114389"
 
 #CSV_LOG_PREFIX = "/home/drums/csv/H429_"
 CSV_LOG_PREFIX = "H429_"
+ENABLE_CSV_LOG = os.getenv("ENABLE_CSV_LOG", "0").lower() in {"1", "true", "yes", "on"}
 
 
 
@@ -82,7 +85,8 @@ class LiveDataStore:
 def write_measurement(writer, imo, serial, addr, label, timestamp, val, unit):
     if str(serial).strip() == "" or str(label).strip() == "" or str(addr).strip() == "":
         return
-    writer.writerow([imo, serial, addr, label, timestamp, val, unit])
+    if writer is not None:
+        writer.writerow([imo, serial, addr, label, timestamp, val, unit])
     if LIVE_DATA_STORE is not None:
         LIVE_DATA_STORE.upsert(imo, serial, addr, label, timestamp, val, unit)
 
@@ -97,9 +101,10 @@ async def read_modbus_data_DG(DG, slave_id, dg_name, imo, serial):
         dt = datetime.datetime.now(datetime.timezone.utc)
         timestamp_iso = dt.strftime("%Y-%m-%dT%H:%M:%S+00:00")
         logfile = f"{CSV_LOG_PREFIX}{dg_name.replace('#','')}-{dt:%Y-%m-%d-%H-%M-%S}.csv"
+        csv_context = open(logfile, "a", newline="") if ENABLE_CSV_LOG else nullcontext(None)
 
-        with open(logfile, "a", newline="") as f:
-            writer = csv.writer(f)
+        with csv_context as f:
+            writer = csv.writer(f) if f is not None else None
 
             # ========== ANALOG ==========
             print(f"\n🧭 {dg_name} Analog Signal")

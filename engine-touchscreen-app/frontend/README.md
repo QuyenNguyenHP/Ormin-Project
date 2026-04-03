@@ -11,14 +11,29 @@ A lightweight, static frontend (HTML/CSS/JS) for monitoring generator analog val
 
 ## 📁 Project Files
 - `index.html`
-- `app.js`
+- `timestamp.html`
+- `config.js`
+- `index.js`
+- `timestamp.js`
 - `app.css`
 
 ## 🔌 Backend API Used
 - `GET /api/live/analog_lable_value`
+- `GET /api/live/timestamp`
 - Default backend base URL: `http://localhost:8000`
 
-If your backend runs on a different host/port, update `API_BASE` in `app.js`.
+If your backend runs on a different host/port, update `config.js` only:
+
+```js
+window.APP_CONFIG = {
+  apiBaseUrl: "http://localhost:8000",
+  refreshMs: 5000,
+  paths: {
+    analog: "/api/live/analog_lable_value",
+    timestamp: "/api/live/timestamp",
+  },
+};
+```
 
 ## ▶️ How To Run
 
@@ -43,7 +58,8 @@ Using `index.htm` will return `404 File not found`.
 1. Check frontend files are served
 - In the static server terminal, you should see:
   - `GET /index.html`
-  - `GET /app.js`
+  - `GET /config.js`
+  - `GET /index.js`
   - `GET /app.css`
 
 2. Check backend API directly in browser

@@ -63,6 +63,16 @@ Edit these values in `data_collector.py` as needed:
 - CSV files in current working directory (prefix like `H429_...csv`)
 - SQLite updates in `data/live_engine_data.db`
 
+### Disable CSV to avoid frontend auto-reload flicker
+If you run frontend with a live-reload server, frequent CSV writes can trigger full page reloads.
+
+- Default now: CSV logging is disabled (`ENABLE_CSV_LOG=0`)
+- To enable CSV logging again:
+
+```bash
+ENABLE_CSV_LOG=1 python data_collector.py
+```
+
 ## 🛠️ Troubleshooting
 
 1. No data in dashboard

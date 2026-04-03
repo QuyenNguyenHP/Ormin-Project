@@ -1,6 +1,9 @@
 (function () {
-  const API_BASE = window.API_BASE_URL || "http://localhost:8000";
-  const API_PATH = "/api/live/analog_lable_value";
+  const config = window.APP_CONFIG || {};
+  const paths = config.paths || {};
+  const API_BASE = config.apiBaseUrl || window.API_BASE_URL || "http://localhost:8000";
+  const API_PATH = paths.analog || "/api/live/analog_lable_value";
+  const POLL_MS = Number(config.refreshMs) > 0 ? Number(config.refreshMs) : 5000;
 
   const grid = document.getElementById("grid");
   const statusDot = document.getElementById("statusDot");
@@ -62,5 +65,5 @@
   }
 
   load();
-  setInterval(load, 5000);
+  setInterval(load, POLL_MS);
 })();
