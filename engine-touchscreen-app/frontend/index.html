@@ -68,6 +68,19 @@
             transform: translateY(-2px);
         }
 
+        .dg-engine-visual {
+            overflow: hidden;
+        }
+
+        .dg-engine-image {
+            transition: transform 0.25s ease-in-out;
+            transform-origin: center center;
+        }
+
+        .dg-card:hover .dg-engine-image {
+            transform: scale(1.08);
+        }
+
         .dg-cards-stage {
             position: relative;
             min-height: 430px;
@@ -130,10 +143,10 @@
         <div id="dg-cards-stage" class="dg-cards-stage mb-8">
             
             <!-- DG NO.1 -->
-            <div class="dg-card" data-dg-card="1" onclick="location.href='./DGs_dashboard.html?dg=1'">
+            <div class="dg-card" data-dg-card="1" onclick="location.href='./DGs_dashboard_V2.html?dg=1'">
                 <span class="dg-title">DG NO.1</span>
-                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
-                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 1" class="max-w-full max-h-full object-contain">
+                <div class="dg-engine-visual h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 1" class="dg-engine-image max-w-full max-h-full object-contain">
                 </div>
                 <div class="flex justify-around items-end pb-2">
                     <div class="flex flex-col items-center">
@@ -149,10 +162,10 @@
             </div>
 
             <!-- DG NO.2 -->
-            <div class="dg-card" data-dg-card="2" onclick="location.href='./DGs_dashboard.html?dg=2'">
+            <div class="dg-card" data-dg-card="2" onclick="location.href='./DGs_dashboard_V2.html?dg=2'">
                 <span class="dg-title">DG NO.2</span>
-                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
-                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 2" class="max-w-full max-h-full object-contain">
+                <div class="dg-engine-visual h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 2" class="dg-engine-image max-w-full max-h-full object-contain">
                 </div>
                 <div class="flex justify-around items-end pb-2">
                     <div class="flex flex-col items-center">
@@ -168,10 +181,10 @@
             </div>
 
             <!-- DG NO.3 -->
-            <div class="dg-card" data-dg-card="3" onclick="location.href='./DGs_dashboard.html?dg=3'">
+            <div class="dg-card" data-dg-card="3" onclick="location.href='./DGs_dashboard_V2.html?dg=3'">
                 <span class="dg-title">DG NO.3</span>
-                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
-                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 3" class="max-w-full max-h-full object-contain">
+                <div class="dg-engine-visual h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 3" class="dg-engine-image max-w-full max-h-full object-contain">
                 </div>
                 <div class="flex justify-around items-end pb-2">
                     <div class="flex flex-col items-center">
@@ -187,10 +200,10 @@
             </div>
 
             <!-- DG NO.4 -->
-            <div class="dg-card" data-dg-card="4" onclick="location.href='./DGs_dashboard.html?dg=4'">
+            <div class="dg-card" data-dg-card="4" onclick="location.href='./DGs_dashboard_V2.html?dg=4'">
                 <span class="dg-title">DG NO.4</span>
-                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
-                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 4" class="max-w-full max-h-full object-contain">
+                <div class="dg-engine-visual h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 4" class="dg-engine-image max-w-full max-h-full object-contain">
                 </div>
                 <div class="flex justify-around items-end pb-2">
                     <div class="flex flex-col items-center">
