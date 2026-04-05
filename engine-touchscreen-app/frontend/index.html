@@ -305,7 +305,7 @@
             if (alarmLight) alarmLight.classList.toggle("active", hasData ? !isRunning : false);
             if (linkFail) {
                 linkFail.dataset.hideWhenOk = "1";
-                linkFail.textContent = hasData ? "" : "Serial link failure";
+                linkFail.textContent = hasData ? "" : "Modbus connection failure";
                 linkFail.style.visibility = hasData ? "hidden" : "visible";
             }
         }
@@ -343,7 +343,7 @@
             loadDigitalStates();
             setInterval(updateClock, 1000); // Cập nhật mỗi giây
             setInterval(loadDigitalStates, 5000); // Cập nhật trạng thái RUN/ALARM mỗi 5 giây
-            setInterval(blinkAlerts, 750); // Nhấp nháy lỗi mỗi 0.75 giây
+            setInterval(blinkAlerts, 1000); // Nhấp nháy lỗi mỗi 1 giây
         };
     </script>
 </body>
