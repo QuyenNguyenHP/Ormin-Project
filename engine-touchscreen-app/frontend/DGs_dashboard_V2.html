@@ -10,7 +10,11 @@
         
         body {
             background-color: #d1d5db;
+            background-image: radial-gradient(#9ca3af 1px, transparent 1px);
+            background-size: 18px 18px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
         }
 
         .digital-value {
@@ -260,19 +264,33 @@
         <div class="flex justify-between items-start mb-6">
             <div class="flex items-center gap-4">
                 <!-- Logo -->
-                <div class="bg-white p-2 border border-gray-400 shadow-sm">
+                <div class="bg-white p-2 border border-gray-300 shadow-sm">
                     <img id="drums-logo-link" src="./Asset/DRUMS_LOGO.png" alt="DRUMS logo" class="h-14 w-auto cursor-pointer">
+                </div>
+
+                <!-- DG Label -->
+                <div class="flex items-center">
+                    <select
+                        id="dg-selector"
+                        class="dg-selector text-4xl font-bold text-red-600/70 drop-shadow-sm bg-transparent border border-red-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        aria-label="Select DG"
+                    >
+                        <option value="1">DG1</option>
+                        <option value="2">DG2</option>
+                        <option value="3">DG3</option>
+                        <option value="4">DG4</option>
+                    </select>
                 </div>
                 
                 <!-- Title & Status -->
-                <div class="flex gap-20 ml-40">
+                <div class="flex gap-10 ml-9">
                     <div class="flex flex-col items-center">
                         <div id="light-ready" class="status-light light-ready"></div>
                         <span class="text-[10px] font-bold mt-1 uppercase">Ready To Start</span>
                     </div>
                     <div class="flex flex-col items-center">
                         <div id="light-run" class="status-light light-run"></div>
-                        <span class="text-[10px] font-bold mt-1 uppercase">Run</span>
+                        <span class="text-[10px] font-bold mt-1 uppercase">Running</span>
                     </div>
                     <div class="flex flex-col items-center">
                         <div class="status-light light-alarm"></div>
@@ -292,7 +310,7 @@
             
             <!-- Background Engine Image (New File) -->
             <div class="absolute inset-0 flex items-center justify-center p-4">
-                <img src="Asset/Engine.png" alt="Engine Layout" class="w-full h-full object-contain opacity-90 pointer-events-none">
+                <img id="engine-background-image" src="Asset/Engine.png" alt="Engine Layout" class="w-full h-full object-contain opacity-90 pointer-events-none">
             </div>
 
             <!-- Cylinder Temperatures (Top) -->
@@ -304,20 +322,6 @@
                     </div>
                 </template>
                 <div id="cylinders-container"></div>
-            </div>
-
-            <!-- DG Label -->
-            <div class="absolute z-10" style="left: 1.5%; top: 4.5%;">
-                <select
-                    id="dg-selector"
-                    class="dg-selector text-6xl font-bold text-red-600/70 drop-shadow-sm bg-transparent border border-red-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-300"
-                    aria-label="Select DG"
-                >
-                    <option value="1">DG1</option>
-                    <option value="2">DG2</option>
-                    <option value="3">DG3</option>
-                    <option value="4">DG4</option>
-                </select>
             </div>
 
             <!-- Left Panel: Engine Speed -->
@@ -524,9 +528,9 @@
         const UI_LAYOUT = {
             cylinders: {
                 count: 6,
-                startX: 37.5,
+                startX: 38.5,
                 stepX: 9,
-                y: '18%',
+                y: '20%',
                 scale: 1.0
             },
             panels: {
@@ -707,12 +711,17 @@
 
             const readyRow = rows.find(item => String(item.label || "").trim().toUpperCase() === "READY TO START");
             const runRow = rows.find(item => String(item.label || "").trim().toUpperCase() === "ENGINE RUN");
+            const isEngineRunning = isOnValue(runRow?.value);
 
             const readyLight = document.getElementById("light-ready");
             const runLight = document.getElementById("light-run");
+            const engineBackgroundImage = document.getElementById("engine-background-image");
 
             if (readyLight) readyLight.classList.toggle("active", isOnValue(readyRow?.value));
-            if (runLight) runLight.classList.toggle("active", isOnValue(runRow?.value));
+            if (runLight) runLight.classList.toggle("active", isEngineRunning);
+            if (engineBackgroundImage) {
+                engineBackgroundImage.src = isEngineRunning ? "Asset/Engine_Runing.gif" : "Asset/Engine.png";
+            }
         }
 
         function updateDigitalTable(data) {
