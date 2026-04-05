@@ -40,6 +40,7 @@ def get_active_alarms(db) -> list[AlarmResponse]:
                 AlarmResponse(
                     addr=item.addr,
                     label=item.label,
+                    dg_name=item.dg_name,
                     severity=severity,
                     value=item.value,
                     unit=item.unit,

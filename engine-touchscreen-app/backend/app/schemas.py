@@ -5,7 +5,9 @@ from pydantic import BaseModel, ConfigDict
 
 class LiveValueResponse(BaseModel):
     addr: str
+    serial: str | None = None
     label: str | None = None
+    dg_name: str | None = None
     value: float | None = None
     unit: str | None = None
     timestamp: datetime
@@ -24,6 +26,7 @@ class TrendResponse(BaseModel):
 class AlarmResponse(BaseModel):
     addr: str
     label: str | None = None
+    dg_name: str | None = None
     severity: str
     value: float | None = None
     unit: str | None = None

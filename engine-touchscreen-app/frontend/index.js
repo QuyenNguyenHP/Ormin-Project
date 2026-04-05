@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const config = window.APP_CONFIG || {};
   const paths = config.paths || {};
   const API_BASE = config.apiBaseUrl || window.API_BASE_URL || "http://localhost:8000";
@@ -11,6 +11,7 @@
   const lastUpdated = document.getElementById("lastUpdated");
   const errorText = document.getElementById("errorText");
   const sourceText = document.getElementById("sourceText");
+  const dgSelector = document.getElementById("dgSelector");
 
   sourceText.textContent = `Source: ${API_BASE}${API_PATH}`;
 
@@ -43,6 +44,17 @@
       });
   }
 
+  function bindDGSelector() {
+    if (!dgSelector) return;
+    dgSelector.addEventListener("click", (ev) => {
+      const btn = ev.target.closest(".dg-btn");
+      if (!btn) return;
+      const dg = String(btn.getAttribute("data-dg") || "").trim();
+      if (!["1", "2", "3", "4"].includes(dg)) return;
+      window.location.href = `./DGs_dashboard.html?dg=${dg}`;
+    });
+  }
+
   function setConnected(ok) {
     statusDot.className = ok ? "dot good" : "dot bad";
     statusText.textContent = ok ? "Connected" : "Disconnected";
@@ -65,5 +77,7 @@
   }
 
   load();
+  bindDGSelector();
   setInterval(load, POLL_MS);
 })();
+

@@ -1,33 +1,350 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Generator Analog Dashboard</title>
-    <link rel="stylesheet" href="./app.css" />
-  </head>
-  <body>
-    <div class="page">
-      <header class="topbar">
-        <div class="topbar-left">
-          <img class="drums-logo" src="./Asset/DRUMS%20logo.png" alt="DRUMS logo" />
-          <div>
-          <h1>Generator Analog Dashboard</h1>
-          <p id="sourceText">Source: http://localhost:8000/api/live/analog_lable_value</p>
-          </div>
-        </div>
-        <div class="status" id="statusBox">
-          <span class="dot" id="statusDot"></span>
-          <span id="statusText">Connecting...</span>
-          <small id="lastUpdated">--</small>
-        </div>
-      </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRUMS HOME - Hệ thống Giám sát 4 DGs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;700&display=swap');
+        
+        body {
+            background-color: #d1d5db;
+            /* Hiệu ứng chấm bi đặc trưng của màn hình giám sát công nghiệp */
+            background-image: radial-gradient(#9ca3af 1px, transparent 1px);
+            background-size: 18px 18px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+        }
 
-      <p class="error" id="errorText"></p>
-      <main class="grid" id="grid"></main>
+        .main-container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background-color: rgba(235, 237, 240, 0.95);
+            border: 2px solid #4b5563;
+            padding: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            min-height: 90vh;
+        }
+
+        /* Đèn trạng thái (Status Lights) */
+        .status-light {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #4b5563, #0f172a);
+            border: 2px solid #334155;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+        
+        /* Trạng thái đèn sáng */
+        .light-run.active { 
+            background: radial-gradient(circle at 35% 35%, #34d399, #064e3b); 
+            box-shadow: 0 0 15px #10b981, inset 0 0 4px rgba(255,255,255,0.3); 
+        }
+        .light-alarm.active { 
+            background: radial-gradient(circle at 35% 35%, #f87171, #7f1d1d); 
+            box-shadow: 0 0 15px #ef4444, inset 0 0 4px rgba(255,255,255,0.3); 
+        }
+
+        /* Card hiển thị máy DG */
+        .dg-card {
+            background-color: #ffffff;
+            border: 1px solid #94a3b8;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .dg-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .dg-cards-stage {
+            position: relative;
+            min-height: 430px;
+        }
+
+        .dg-title {
+            color: #1d4ed8;
+            font-weight: 800;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #1d4ed8;
+            margin-bottom: 12px;
+            display: block;
+            padding-bottom: 4px;
+        }
+
+        .serial-fail {
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-top: 10px;
+            height: 1.2rem; /* Giữ chỗ để không bị nhảy layout khi blink */
+        }
+
+        .header-box {
+            background-color: #fff;
+            border: 1px solid #64748b;
+            padding: 6px 12px;
+            box-shadow: 1px 1px 0px #475569;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Header Section -->
+        <div id="header-stage" class="relative flex justify-between items-start mb-6" style="min-height: 110px;">
+            <!-- Khối Ngày & Giờ -->
+            <div id="date-time-box" class="header-box min-w-[200px]">
+                <div class="text-[10px] font-extrabold border-b border-gray-100 mb-1 text-center text-gray-600">DATE & TIME</div>
+                <div class="text-base font-bold text-center tracking-tight" id="clock">--/--/-- &nbsp;&nbsp; --:--:--</div>
+            </div>
+
+            <!-- DRUMS Logo Center -->
+            <div id="logo-box" class="absolute left-1/2 -translate-x-1/2 bg-white border-[3px] border-gray-400 p-3 shadow-sm flex items-center justify-center">
+                <img src="./Asset/DRUMS_LOGO.png" alt="DRUMS logo" class="h-16 w-auto object-contain">
+            </div>
+
+            <!-- Icons bên phải -->
+            <div id="header-icons" class="flex gap-2">
+                <button title="User Profile" class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </button>
+                <button title="System Info" class="w-10 h-10 bg-white border-2 border-blue-800 rounded-full flex items-center justify-center text-blue-800 font-black hover:bg-blue-50 transition-colors shadow-sm">i</button>
+            </div>
+        </div>
+
+        <!-- Grid 4 máy DG -->
+        <div id="dg-cards-stage" class="dg-cards-stage mb-8">
+            
+            <!-- DG NO.1 -->
+            <div class="dg-card" data-dg-card="1" onclick="location.href='./DGs_dashboard.html?dg=1'">
+                <span class="dg-title">DG NO.1</span>
+                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 1" class="max-w-full max-h-full object-contain">
+                </div>
+                <div class="flex justify-around items-end pb-2">
+                    <div class="flex flex-col items-center">
+                        <div id="dg1-run-light" class="status-light light-run"></div>
+                        <span class="text-[10px] font-extrabold mt-1">RUN</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="dg1-alarm-light" class="status-light light-alarm"></div>
+                        <span class="text-[10px] font-extrabold mt-1">ALARM</span>
+                    </div>
+                </div>
+                <div id="dg1-link-fail" class="serial-fail">Serial link failure</div>
+            </div>
+
+            <!-- DG NO.2 -->
+            <div class="dg-card" data-dg-card="2" onclick="location.href='./DGs_dashboard.html?dg=2'">
+                <span class="dg-title">DG NO.2</span>
+                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 2" class="max-w-full max-h-full object-contain">
+                </div>
+                <div class="flex justify-around items-end pb-2">
+                    <div class="flex flex-col items-center">
+                        <div id="dg2-run-light" class="status-light light-run"></div>
+                        <span class="text-[10px] font-extrabold mt-1">RUN</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="dg2-alarm-light" class="status-light light-alarm"></div>
+                        <span class="text-[10px] font-extrabold mt-1">ALARM</span>
+                    </div>
+                </div>
+                <div id="dg2-link-fail" class="serial-fail">Serial link failure</div>
+            </div>
+
+            <!-- DG NO.3 -->
+            <div class="dg-card" data-dg-card="3" onclick="location.href='./DGs_dashboard.html?dg=3'">
+                <span class="dg-title">DG NO.3</span>
+                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 3" class="max-w-full max-h-full object-contain">
+                </div>
+                <div class="flex justify-around items-end pb-2">
+                    <div class="flex flex-col items-center">
+                        <div id="dg3-run-light" class="status-light light-run"></div>
+                        <span class="text-[10px] font-extrabold mt-1">RUN</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="dg3-alarm-light" class="status-light light-alarm"></div>
+                        <span class="text-[10px] font-extrabold mt-1">ALARM</span>
+                    </div>
+                </div>
+                <div id="dg3-link-fail" class="serial-fail">Serial link failure</div>
+            </div>
+
+            <!-- DG NO.4 -->
+            <div class="dg-card" data-dg-card="4" onclick="location.href='./DGs_dashboard.html?dg=4'">
+                <span class="dg-title">DG NO.4</span>
+                <div class="h-44 mb-4 bg-gray-50 flex items-center justify-center border border-gray-100 p-2">
+                    <img src="./Asset/engine_image_mainpage.png" alt="Diesel Generator 4" class="max-w-full max-h-full object-contain">
+                </div>
+                <div class="flex justify-around items-end pb-2">
+                    <div class="flex flex-col items-center">
+                        <div id="dg4-run-light" class="status-light light-run"></div>
+                        <span class="text-[10px] font-extrabold mt-1">RUN</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="dg4-alarm-light" class="status-light light-alarm"></div>
+                        <span class="text-[10px] font-extrabold mt-1">ALARM</span>
+                    </div>
+                </div>
+                <div id="dg4-link-fail" class="serial-fail">Serial link failure</div>
+            </div>
+
+        </div>
+
+        <!-- Thanh trạng thái phía dưới (Status Bar) -->
+        <div id="system-status-bar" class="mt-auto border border-gray-400 bg-gray-200 p-2 text-[10px] font-bold flex justify-between text-gray-700 shadow-inner">
+            <div class="flex gap-6">
+                <span>SYSTEM STATUS: <span class="text-green-700">NORMAL</span></span>
+                <span>COMMUNICATION: <span class="text-blue-700">TCP/IP CONNECTED</span></span>
+            </div>
+            <div class="italic">DRUMS v2.5.0</div>
+        </div>
     </div>
 
-    <script src="./config.js"></script>
-    <script src="./index.js"></script>
-  </body>
+    <script>
+        const API_BASE = "http://localhost:8000";
+        const DIGITAL_API_PATH = "/api/live/live_digital_value";
+
+        // Cập nhật đồng hồ thời gian thực
+        const UI_LAYOUT = {
+            dateTimeBox: { mode: "absolute", x: "0%", y: "0%" },
+            logoBox: { mode: "absolute", x: "50%", y: "0%", transform: "translateX(-50%)" },
+            headerIcons: { mode: "absolute", x: "100%", y: "0%", transform: "translateX(-100%)" },
+            systemStatusBar: { mode: "static" }
+        };
+
+        const CARD_LAYOUT = {
+            "1": { x: "1%", y: "15%", width: "24%" },
+            "2": { x: "26%", y: "15%", width: "24%" },
+            "3": { x: "51%", y: "15%", width: "24%" },
+            "4": { x: "76%", y: "15%", width: "24%" }
+        };
+
+        function applyLayoutForElement(el, cfg) {
+            if (!el || !cfg) return;
+            if ((cfg.mode || "absolute") === "static") {
+                el.style.position = "static";
+                el.style.left = "";
+                el.style.top = "";
+                el.style.transform = "";
+                return;
+            }
+            el.style.position = "absolute";
+            if (cfg.x != null) el.style.left = cfg.x;
+            if (cfg.y != null) el.style.top = cfg.y;
+            el.style.transform = cfg.transform || "";
+            if (cfg.width != null) el.style.width = cfg.width;
+            if (cfg.height != null) el.style.height = cfg.height;
+        }
+
+        function applyUILayout(layout = UI_LAYOUT) {
+            applyLayoutForElement(document.getElementById("date-time-box"), layout.dateTimeBox);
+            applyLayoutForElement(document.getElementById("logo-box"), layout.logoBox);
+            applyLayoutForElement(document.getElementById("header-icons"), layout.headerIcons);
+            applyLayoutForElement(document.getElementById("system-status-bar"), layout.systemStatusBar);
+        }
+
+        function applyCardLayout(layout = CARD_LAYOUT) {
+            const stage = document.getElementById("dg-cards-stage");
+            if (!stage) return;
+            const cards = stage.querySelectorAll(".dg-card[data-dg-card]");
+            cards.forEach((card) => {
+                const key = card.getAttribute("data-dg-card");
+                const cfg = layout[key];
+                if (!cfg) return;
+                card.style.position = "absolute";
+                if (cfg.x != null) card.style.left = cfg.x;
+                if (cfg.y != null) card.style.top = cfg.y;
+                if (cfg.width != null) card.style.width = cfg.width;
+                if (cfg.height != null) card.style.height = cfg.height;
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
+            const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+            const clockEl = document.getElementById('clock');
+            if (clockEl) clockEl.innerHTML = `${dateStr} &nbsp;&nbsp; ${timeStr}`;
+        }
+
+        // Hiệu ứng nhấp nháy cho cảnh báo "Serial link failure"
+        function blinkAlerts() {
+            const alerts = document.querySelectorAll('.serial-fail');
+            alerts.forEach(el => {
+                if (el.dataset.hideWhenOk === "1" && el.textContent.trim() === "") {
+                    el.style.visibility = 'hidden';
+                    return;
+                }
+                el.style.visibility = (el.style.visibility === 'hidden' ? 'visible' : 'hidden');
+            });
+        }
+
+        function setDGState(dgNo, isRunning, hasData) {
+            const runLight = document.getElementById(`dg${dgNo}-run-light`);
+            const alarmLight = document.getElementById(`dg${dgNo}-alarm-light`);
+            const linkFail = document.getElementById(`dg${dgNo}-link-fail`);
+
+            if (runLight) runLight.classList.toggle("active", !!isRunning);
+            if (alarmLight) alarmLight.classList.toggle("active", hasData ? !isRunning : false);
+            if (linkFail) {
+                linkFail.dataset.hideWhenOk = "1";
+                linkFail.textContent = hasData ? "" : "Serial link failure";
+                linkFail.style.visibility = hasData ? "hidden" : "visible";
+            }
+        }
+
+        async function loadDigitalStates() {
+            try {
+                const res = await fetch(`${API_BASE}${DIGITAL_API_PATH}`, { cache: "no-store" });
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const data = await res.json();
+                const rows = Array.isArray(data) ? data : [];
+
+                for (let dgNo = 1; dgNo <= 4; dgNo++) {
+                    const dgName = `DG#${dgNo}`;
+                    const point = rows.find(
+                        (r) => (r.dg_name || "").trim() === dgName && (r.label || "").trim().toUpperCase() === "ENGINE RUN"
+                    );
+                    const hasData = !!point;
+                    const val = Number(point?.value);
+                    const isRunning = hasData && !Number.isNaN(val) && val === 1;
+                    setDGState(dgNo, isRunning, hasData);
+                }
+            } catch (error) {
+                console.error("Digital fetch error:", error);
+                for (let dgNo = 1; dgNo <= 4; dgNo++) {
+                    setDGState(dgNo, false, false);
+                }
+            }
+        }
+
+        // Khởi tạo các sự kiện
+        window.onload = () => {
+            applyUILayout();
+            applyCardLayout();
+            updateClock();
+            loadDigitalStates();
+            setInterval(updateClock, 1000); // Cập nhật mỗi giây
+            setInterval(loadDigitalStates, 5000); // Cập nhật trạng thái RUN/ALARM mỗi 5 giây
+            setInterval(blinkAlerts, 750); // Nhấp nháy lỗi mỗi 0.75 giây
+        };
+    </script>
+</body>
 </html>

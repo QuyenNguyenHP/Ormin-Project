@@ -13,6 +13,7 @@ class LiveEngineData(Base):
 
     imo: Mapped[int | None] = mapped_column(Integer, nullable=True)
     serial: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dg_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     addr: Mapped[str] = mapped_column(Text, primary_key=True)
     label: Mapped[str | None] = mapped_column(Text, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, primary_key=True)

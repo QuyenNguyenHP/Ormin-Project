@@ -26,7 +26,9 @@ def get_latest_all(db: Session) -> list[LiveValueResponse]:
     return [
         LiveValueResponse(
             addr=r.addr,
+            serial=r.serial,
             label=r.label,
+            dg_name=r.dg_name,
             value=r.val,
             unit=r.unit,
             timestamp=r.timestamp,
@@ -47,7 +49,9 @@ def get_latest_by_addr(db: Session, addr: str) -> LiveValueResponse | None:
         return None
     return LiveValueResponse(
         addr=row.addr,
+        serial=row.serial,
         label=row.label,
+        dg_name=row.dg_name,
         value=row.val,
         unit=row.unit,
         timestamp=row.timestamp,

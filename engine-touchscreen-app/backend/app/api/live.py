@@ -2,12 +2,51 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.config import (
+    ANALOG_PROFILE_BY_DG_NAME,
+    ANALOG_PROFILE_BY_SERIAL,
+    ANALOG_THRESHOLD_PROFILES,
+)
 from app.db import get_db
 from app.models import LiveEngineData
 from app.schemas import LiveValueResponse
 from app.services.live_service import get_latest_all, get_latest_by_addr, get_latest_by_group
 
 router = APIRouter(prefix="/api/live", tags=["live"])
+
+
+def _condition_match(value: float | None, cond: dict | None) -> bool:
+    if value is None or not cond:
+        return False
+    if "gt" in cond and not (value > cond["gt"]):
+        return False
+    if "gte" in cond and not (value >= cond["gte"]):
+        return False
+    if "lt" in cond and not (value < cond["lt"]):
+        return False
+    if "lte" in cond and not (value <= cond["lte"]):
+        return False
+    return True
+
+
+def _pick_profile_key(serial: str | None, dg_name: str | None) -> str:
+    if serial and serial in ANALOG_PROFILE_BY_SERIAL:
+        return ANALOG_PROFILE_BY_SERIAL[serial]
+    if dg_name and dg_name in ANALOG_PROFILE_BY_DG_NAME:
+        return ANALOG_PROFILE_BY_DG_NAME[dg_name]
+    return "default"
+
+
+def _classify_status(value: float | None, rule: dict | None) -> str:
+    if not rule:
+        return "N/A"
+    if _condition_match(value, rule.get("critical")):
+        return "Critical"
+    if _condition_match(value, rule.get("warning")):
+        return "Warning"
+    if _condition_match(value, rule.get("normal")):
+        return "Normal"
+    return "N/A"
 
 
 @router.get("/all", response_model=list[LiveValueResponse])
@@ -30,10 +69,45 @@ def live_lable_value(db: Session = Depends(get_db)):
 @router.get("/analog_lable_value")
 def live_analog_lable_value(db: Session = Depends(get_db)):
     rows = get_latest_all(db)
+    result = []
+    for r in rows:
+        if (r.unit or "").strip().lower() == "on/off":
+            continue
+        profile_key = _pick_profile_key(r.serial, r.dg_name)
+        profile = ANALOG_THRESHOLD_PROFILES.get(profile_key, ANALOG_THRESHOLD_PROFILES["default"])
+        rule = profile.get((r.label or "").strip())
+        result.append(
+            {
+                "label": r.label,
+                "value": r.value,
+                "unit": r.unit,
+                "dg_name": r.dg_name,
+                "status": _classify_status(r.value, rule),
+                "profile": profile_key,
+                "thresholds": {
+                    "normal": (rule or {}).get("normal"),
+                    "warning": (rule or {}).get("warning"),
+                    "critical": (rule or {}).get("critical"),
+                },
+            }
+        )
+    return result
+
+
+@router.get("/live_digital_value")
+def live_digital_value(db: Session = Depends(get_db)):
+    rows = get_latest_all(db)
     return [
-        {"label": r.label, "value": r.value}
+        {
+            "addr": r.addr,
+            "label": r.label,
+            "value": r.value,
+            "unit": r.unit,
+            "dg_name": r.dg_name,
+            "timestamp": r.timestamp,
+        }
         for r in rows
-        if (r.unit or "").strip().lower() != "on/off"
+        if (r.unit or "").strip().lower() == "on/off"
     ]
 
 
