@@ -1,81 +1,68 @@
-﻿# 🚀 Generator Analog Dashboard (Static Frontend)
+# Engine Touchscreen Frontend 🖥️
 
-A lightweight, static frontend (HTML/CSS/JS) for monitoring generator analog values from your backend API.
+Static frontend for the DG monitoring dashboards ⚙️
 
-## ✨ Highlights
-- ⚡ No build tool required (no Vite/NPM needed to run)
-- 🔄 Auto-refresh every 5 seconds
-- 🟢 Connection status: Connected / Disconnected
-- 🕒 Last updated timestamp
-- 📊 Clean card view for `label` + `value`
+## 1. Folder Structure 📁
 
-## 📁 Project Files
-- `index.html`
-- `timestamp.html`
-- `config.js`
-- `index.js`
-- `timestamp.js`
-- `app.css`
-
-## 🔌 Backend API Used
-- `GET /api/live/analog_lable_value`
-- `GET /api/live/timestamp`
-- Default backend base URL: `http://localhost:8000`
-
-If your backend runs on a different host/port, update `config.js` only:
-
-```js
-window.APP_CONFIG = {
-  apiBaseUrl: "http://localhost:8000",
-  refreshMs: 5000,
-  paths: {
-    analog: "/api/live/analog_lable_value",
-    timestamp: "/api/live/timestamp",
-  },
-};
+```text
+frontend/
+  Asset/
+    DAIKAI_LOGO.jpg
+    DRUMS_LOGO.png
+    DRUMS_logo_small.png
+    Engine.png
+    Engine_image.png
+    engine_image_mainpage.png
+    Engine_Runing.gif
+    Engine_Runing_1.gif
+  index.html
+  DGs_dashboard_V2.html
+  DGs_dashboard.html.bak
+  config.js
+  index.js
+  app.css
+  README.md
 ```
 
-## ▶️ How To Run
+## 2. Active Pages 🌐
 
-### Option 1: Open directly
-Open `index.html` in your browser.
+- `index.html`: home page with 4 DG cards, READY/RUNNING/ALARM lights, and `FAIL CONNECTION !` warning when data is missing 🚨
+- `DGs_dashboard_V2.html`: DG detail page (`?dg=1..4`) showing analog + digital + alarm data 📊
 
-### Option 2: Run with Python static server (recommended)
+## 3. Favicon (Browser Tab Logo) 🏷️
+
+Both pages currently use:
+
+- `./Asset/DRUMS_logo_small.png`
+
+## 4. API Endpoints Used by Frontend 🔌
+
+### `index.html`
+- `GET /api/live/live_digital_value`
+
+### `DGs_dashboard_V2.html`
+- `GET /api/live/analog_lable_value`
+- `GET /api/live/live_digital_value`
+- `GET /api/alarms/dg_status`
+
+Default API base URL: `http://localhost:8000` 🧭
+
+## 5. Run Frontend ▶️
+
+Open HTML files directly, or run a static server:
+
 ```bash
 cd frontend
-python3 -m http.server 5170
+python -m http.server 5170
 ```
+
 Then open:
-- `http://localhost:5170/`
-- or `http://localhost:5170/index.html`
 
-## ❗ Important Note
-Use `index.html` (NOT `index.htm`).
-Using `index.htm` will return `404 File not found`.
+- `http://localhost:5170/index.html`
+- `http://localhost:5170/DGs_dashboard_V2.html?dg=1`
 
-## 🛠️ Quick Troubleshooting
+## 6. Important Notes 📝
 
-1. Check frontend files are served
-- In the static server terminal, you should see:
-  - `GET /index.html`
-  - `GET /config.js`
-  - `GET /index.js`
-  - `GET /app.css`
-
-2. Check backend API directly in browser
-- Open: `http://localhost:8000/api/live/analog_lable_value`
-
-3. Check browser console
-- Press `F12` → `Console`
-- Look for fetch/CORS/network errors
-
-## 🌐 WSL Note
-If you run `python3 -m http.server` inside WSL, open the frontend from Windows browser using:
-- `http://localhost:5170`
-- or `http://127.0.0.1:5170`
-
-## 📌 Dashboard Behavior
-- Refreshes data every 5 seconds
-- Shows backend connection state
-- Shows latest refresh time
-- Renders all analog metrics as cards
+- `DGs_dashboard.html.bak` is a backup file, not the active page 💾
+- `config.js`, `index.js`, `app.css` are legacy files and are currently not imported by `index.html` or `DGs_dashboard_V2.html` 🧩
+- If favicon/logo updates do not appear immediately, use `Ctrl + F5` to hard refresh 🔄

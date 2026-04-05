@@ -1,58 +1,75 @@
-﻿# 🚀 Backend API (FastAPI + SQLite)
+# Engine Touchscreen Backend 🚀
 
-This backend serves generator monitoring data from SQLite and exposes JSON APIs for the dashboard.
+Backend API built with FastAPI + SQLite for the DG engine monitoring system.
 
-## ✨ Features
+## ✨ Key Features
+
 - ⚡ FastAPI-based REST API
 - 🗄️ SQLite data source (`data/live_engine_data.db`)
-- 🧠 Service-layer structure (`live`, `trends`, `alarms`, `system`)
-- 🌐 CORS enabled for frontend access
-- 📘 Auto API docs via Swagger
+- 🧠 Clear layered structure: `api/`, `services/`, `models/`, `schemas/`
+- 🌐 CORS enabled (`CORS_ORIGINS = ["*"]`)
+- 📘 Built-in Swagger/OpenAPI docs
 
-## 📁 Structure
-- `app/main.py` → FastAPI app entrypoint
-- `app/config.py` → app config, DB path, alarm rules
-- `app/db.py` → SQLAlchemy engine/session dependency
-- `app/models.py` → ORM model (`live_engine_data`)
-- `app/schemas.py` → Pydantic response schemas
-- `app/services/` → business logic
-- `app/api/` → API routers
-- `run.py` → local startup script
-- `requirements.txt` → Python dependencies
+## 📁 Folder Structure
 
-## 🗄️ Database
-Configured in `app/config.py`:
-- `DB_PATH = project_root/data/live_engine_data.db`
+```text
+backend/
+  app/
+    main.py
+    config.py
+    db.py
+    models.py
+    schemas.py
+    api/
+      live.py
+      trends.py
+      alarms.py
+      system.py
+    services/
+      live_service.py
+      trend_service.py
+      alarm_service.py
+      system_service.py
+    utils/
+      time_utils.py
+      formatters.py
+  run.py
+  requirements.txt
+  README.md
+```
 
-Expected main table:
-- `live_engine_data`
+## 🗄️ Database Configuration
 
-Main fields used by API:
-- `imo`, `serial`, `addr`, `label`, `timestamp`, `val`, `unit`
+- DB path is configured in `app/config.py`:
+  - `DB_PATH = project_root/data/live_engine_data.db`
+- Main table used by the API:
+  - `live_engine_data`
 
-## 🔌 API Endpoints
+## 🔌 Current API Endpoints
 
-### Live
+### Live Data 📡
 - `GET /api/live/all`
-- `GET /api/live/{addr}`
-- `GET /api/live/group/{group_name}`
 - `GET /api/live/timestamp`
 - `GET /api/live/lable_value`
 - `GET /api/live/analog_lable_value`
+- `GET /api/live/live_digital_value`
+- `GET /api/live/{addr}`
+- `GET /api/live/group/{group_name}`
 
-### Trends
+### Trends 📈
 - `GET /api/trends/{addr}?hours=1`
 - `GET /api/trends/{addr}?from=...&to=...`
 
-### Alarms
+### Alarms 🚨
 - `GET /api/alarms/active`
 - `GET /api/alarms/history`
+- `GET /api/alarms/dg_status`
 
-### System
+### System 🩺
 - `GET /api/system/health`
 - `GET /api/system/status`
 
-## ▶️ Run Backend
+## ▶️ Run the Backend
 
 ```bash
 cd backend
@@ -60,7 +77,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-Alternative:
+Or run Uvicorn directly:
 
 ```bash
 cd backend
@@ -68,42 +85,50 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## 📘 API Docs
+
 - Swagger UI: `http://localhost:8000/docs`
 - OpenAPI JSON: `http://localhost:8000/openapi.json`
 
-## 🛠️ Quick Test
+## 🧪 Quick Test
 
 PowerShell:
+
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8000/api/live/analog_lable_value" -Method Get | ConvertTo-Json -Depth 5
 ```
 
 Browser:
+
 - `http://localhost:8000/api/live/analog_lable_value`
+- `http://localhost:8000/api/live/live_digital_value`
+- `http://localhost:8000/api/alarms/dg_status`
 
-## 🧪 Notes About Current Implementation
-- `analog_lable_value` returns only rows with `unit != "On/Off"`.
-- `lable_value` keeps current naming to match your existing usage.
-- `alarms/history` currently returns the same result as active alarms (placeholder behavior).
+## ⚙️ Implementation Notes
 
-## ⚠️ Troubleshooting
+- `analog_lable_value` returns analog points (`unit != "On/Off"`).
+- `live_digital_value` is used by both home and DG detail dashboards.
+- `alarms/history` is currently a placeholder implementation.
+- The endpoint name `lable_value` is intentionally kept for backward compatibility.
 
-1. `Address not found` on `/api/live/timestamp`
-- Ensure static routes are defined before dynamic `/{addr}` route (already handled in current code).
+## 🛠️ Troubleshooting
 
-2. Empty results (`[]`)
-- Collector may not be running or DB has no recent data.
-- Verify collector writes to `data/live_engine_data.db`.
+1. ❌ API returns `[]`
+- Check whether the collector is writing data to `data/live_engine_data.db`.
+- Verify that the DB has recent timestamps.
 
-3. CORS/frontend fetch issue
-- Check backend is running on expected host/port.
-- Confirm frontend API base URL matches backend.
+2. 🌐 Frontend cannot fetch API
+- Confirm backend is running on the expected host/port (`localhost:8000`).
+- Verify frontend API URLs match backend URLs.
 
-4. Import/module errors
-- Run commands from inside `backend` folder.
-- Ensure dependencies from `requirements.txt` are installed.
+3. 📦 Import/module errors
+- Run commands from inside the `backend` directory.
+- Reinstall dependencies from `requirements.txt`.
 
-## 📌 Recommended Next Improvements
-- Add `id INTEGER PRIMARY KEY AUTOINCREMENT` for easier maintenance.
-- Add dedicated alarm history storage.
-- Add authentication if exposing API beyond local network.
+4. ⏱️ `/api/live/timestamp` is matched incorrectly
+- Ensure static routes are declared before dynamic route `/{addr}` (already handled in current code).
+
+## 📌 Suggested Next Improvements
+
+- 🔐 Add authentication for non-local deployments.
+- 🧾 Implement real alarm history persistence.
+- 📊 Add richer operational health/metrics endpoints.

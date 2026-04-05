@@ -34,6 +34,25 @@ class AlarmResponse(BaseModel):
     message: str
 
 
+class DGAlarmTrigger(BaseModel):
+    source: str
+    addr: str
+    label: str | None = None
+    value: float | None = None
+    unit: str | None = None
+    severity: str | None = None
+    timestamp: datetime
+
+
+class DGAlarmStatusResponse(BaseModel):
+    dg_name: str
+    alarm: str
+    analog_critical_count: int
+    digital_alarm_count: int
+    timestamp: datetime | None = None
+    triggers: list[DGAlarmTrigger]
+
+
 class SystemHealthResponse(BaseModel):
     status: str
     db_path: str

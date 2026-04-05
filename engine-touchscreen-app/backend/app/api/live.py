@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -112,8 +112,12 @@ def live_digital_value(db: Session = Depends(get_db)):
 
 
 @router.get("/{addr}", response_model=LiveValueResponse)
-def live_by_addr(addr: str, db: Session = Depends(get_db)):
-    item = get_latest_by_addr(db, addr)
+def live_by_addr(
+    addr: str,
+    serial: str | None = Query(default=None, description="Filter by DG serial"),
+    db: Session = Depends(get_db),
+):
+    item = get_latest_by_addr(db, addr, serial=serial)
     if item is None:
         raise HTTPException(status_code=404, detail="Address not found")
     return item

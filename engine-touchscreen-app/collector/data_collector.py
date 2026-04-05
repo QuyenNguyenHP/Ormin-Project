@@ -18,9 +18,18 @@ ENABLE_CSV_LOG = os.getenv("ENABLE_CSV_LOG", "1").lower() in {"1", "true", "yes"
 
 DG1_IP = "192.168.18.26"
 DG1_SLAVE_ID = 16
-DG1_Name = "DG#2"
+DG1_Name = "DG#1"
 DG1_SerialNo = "DE618Z5178"
 
+DG2_IP = "192.168.18.26"
+DG2_SLAVE_ID = 16
+DG2_Name = "DG#2"
+DG2_SerialNo = "DE618Z5179"
+
+DG3_IP = "192.168.18.26"
+DG3_SLAVE_ID = 16
+DG3_Name = "DG#3"
+DG3_SerialNo = "DE618Z5180"
 
 LIVE_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "live_engine_data.db"
 LIVE_DATA_STORE = None
@@ -391,9 +400,13 @@ async def main():
     LIVE_DATA_STORE = LiveDataStore(LIVE_DB_PATH)
 
     DG1 = AsyncModbusTcpClient(DG1_IP, timeout=5)
+    DG2 = AsyncModbusTcpClient(DG2_IP, timeout=5)
+    DG3 = AsyncModbusTcpClient(DG3_IP, timeout=5)
 
     clients = [
         (DG1, DG1_IP, read_modbus_data_DG, (DG1_SLAVE_ID, DG1_Name, IMO_NO, DG1_SerialNo)),
+        (DG2, DG2_IP, read_modbus_data_DG, (DG2_SLAVE_ID, DG2_Name, IMO_NO, DG2_SerialNo)),
+        (DG3, DG3_IP, read_modbus_data_DG, (DG3_SLAVE_ID, DG3_Name, IMO_NO, DG3_SerialNo)),
     ]
 
     try:

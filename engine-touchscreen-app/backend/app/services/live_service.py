@@ -1,26 +1,14 @@
-from sqlalchemy import func, select
+from sqlalchemy import cast, select
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.sqltypes import Integer
 
 from app.models import LiveEngineData
 from app.schemas import LiveValueResponse
 
 
 def get_latest_all(db: Session) -> list[LiveValueResponse]:
-    latest_ts = (
-        select(LiveEngineData.addr, func.max(LiveEngineData.timestamp).label("max_ts"))
-        .group_by(LiveEngineData.addr)
-        .subquery()
-    )
-
-    stmt = (
-        select(LiveEngineData)
-        .join(
-            latest_ts,
-            (LiveEngineData.addr == latest_ts.c.addr)
-            & (LiveEngineData.timestamp == latest_ts.c.max_ts),
-        )
-        .order_by(LiveEngineData.addr)
-    )
+    # Collector already upserts one latest row per (serial, addr), so fetch all rows directly.
+    stmt = select(LiveEngineData).order_by(LiveEngineData.serial, cast(LiveEngineData.addr, Integer))
 
     rows = db.execute(stmt).scalars().all()
     return [
@@ -37,13 +25,11 @@ def get_latest_all(db: Session) -> list[LiveValueResponse]:
     ]
 
 
-def get_latest_by_addr(db: Session, addr: str) -> LiveValueResponse | None:
-    stmt = (
-        select(LiveEngineData)
-        .where(LiveEngineData.addr == addr)
-        .order_by(LiveEngineData.timestamp.desc())
-        .limit(1)
-    )
+def get_latest_by_addr(db: Session, addr: str, serial: str | None = None) -> LiveValueResponse | None:
+    stmt = select(LiveEngineData).where(LiveEngineData.addr == addr)
+    if serial:
+        stmt = stmt.where(LiveEngineData.serial == serial)
+    stmt = stmt.order_by(LiveEngineData.timestamp.desc()).limit(1)
     row = db.execute(stmt).scalar_one_or_none()
     if row is None:
         return None

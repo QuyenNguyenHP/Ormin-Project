@@ -119,7 +119,9 @@ ANALOG_THRESHOLD_PROFILES = {
 # Map machine identity to profile key.
 ANALOG_PROFILE_BY_SERIAL = {
     "DE618Z5178": "default",
+    "DE618Z5179": "default",
 }
 ANALOG_PROFILE_BY_DG_NAME = {
     "DG#1": "default",
+    "DG#2": "default",
 }

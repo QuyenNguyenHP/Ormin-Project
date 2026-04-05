@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRUMS - Engine Monitoring System</title>
+    <link rel="icon" type="image/png" href="./Asset/DRUMS_logo_small.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;700&display=swap');
@@ -14,7 +15,7 @@
             background-size: 18px 18px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 16px;
         }
 
         .digital-value {
@@ -39,16 +40,36 @@
 
         /* Hiá»‡u á»©ng Ä‘Ã¨n bÃ¡o */
         .status-light {
-            width: 40px;
-            height: 40px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #4b5563, #111827);
             border: 2px solid #374151;
             box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
         .light-ready.active { background: radial-gradient(circle at 30% 30%, #34d399, #065f46); box-shadow: 0 0 10px #10b981; }
         .light-run.active { background: radial-gradient(circle at 30% 30%, #34d399, #065f46); box-shadow: 0 0 10px #10b981; }
         .light-alarm.active { background: radial-gradient(circle at 30% 30%, #f87171, #991b1b); box-shadow: 0 0 10px #ef4444; }
+
+        .header-status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .header-status-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.1;
+            text-transform: uppercase;
+            color: #111827;
+        }
 
         .engine-container {
             background-image: linear-gradient(to bottom, #ffffff, #f3f4f6);
@@ -229,6 +250,11 @@
             text-align: left;
         }
 
+        .digital-table th:nth-child(2),
+        .digital-table td:nth-child(2) {
+            text-align: center;
+        }
+
         .digital-table th {
             position: sticky;
             top: 0;
@@ -242,10 +268,27 @@
             font-weight: 700;
         }
 
+        .digital-table .digital-status-on {
+            background-color: #16a34a;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
         .dg-selector option {
             font-size: 0.67em;
             color: #1d4ed8;
             font-weight: 700;
+        }
+
+        .header-clickable {
+            cursor: pointer;
+            transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+            transform-origin: center center;
+        }
+
+        .header-clickable:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         @media (max-width: 980px) {
@@ -264,7 +307,7 @@
         <div class="flex justify-between items-start mb-6">
             <div class="flex items-center gap-4">
                 <!-- Logo -->
-                <div class="bg-white p-2 border border-gray-300 shadow-sm">
+                <div class="header-clickable">
                     <img id="drums-logo-link" src="./Asset/DRUMS_LOGO.png" alt="DRUMS logo" class="h-14 w-auto cursor-pointer">
                 </div>
 
@@ -272,7 +315,7 @@
                 <div class="flex items-center">
                     <select
                         id="dg-selector"
-                        class="dg-selector text-4xl font-bold text-red-600/70 drop-shadow-sm bg-transparent border border-red-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        class="header-clickable dg-selector text-4xl font-bold text-red-600/70 drop-shadow-sm bg-transparent border border-red-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-300"
                         aria-label="Select DG"
                     >
                         <option value="1">DG1</option>
@@ -283,18 +326,18 @@
                 </div>
                 
                 <!-- Title & Status -->
-                <div class="flex gap-10 ml-9">
-                    <div class="flex flex-col items-center">
+                <div class="flex gap-4 ml-9">
+                    <div class="header-status-item">
                         <div id="light-ready" class="status-light light-ready"></div>
-                        <span class="text-[10px] font-bold mt-1 uppercase">Ready To Start</span>
+                        <span class="header-status-label">Ready To Start</span>
                     </div>
-                    <div class="flex flex-col items-center">
+                    <div class="header-status-item">
                         <div id="light-run" class="status-light light-run"></div>
-                        <span class="text-[10px] font-bold mt-1 uppercase">Running</span>
+                        <span class="header-status-label">Running</span>
                     </div>
-                    <div class="flex flex-col items-center">
-                        <div class="status-light light-alarm"></div>
-                        <span class="text-[10px] font-bold mt-1 uppercase">Alarm</span>
+                    <div class="header-status-item">
+                        <div id="light-alarm" class="status-light light-alarm"></div>
+                        <span class="header-status-label">Alarm</span>
                     </div>
                 </div>
             </div>
@@ -400,8 +443,8 @@
                 <table class="digital-table">
                     <thead>
                         <tr>
-                            <th>LABEL</th>
-                            <th>VALUE</th>
+                            <th>CHANNEL DESCRIPTION</th>
+                            <th>STATUS</th>
                         </tr>
                     </thead>
                     <tbody id="digital-value-tbody-left"></tbody>
@@ -409,8 +452,8 @@
                 <table class="digital-table">
                     <thead>
                         <tr>
-                            <th>LABEL</th>
-                            <th>VALUE</th>
+                            <th>CHANNEL DESCRIPTION</th>
+                            <th>STATUS</th>
                         </tr>
                     </thead>
                     <tbody id="digital-value-tbody-right"></tbody>
@@ -724,6 +767,14 @@
             }
         }
 
+        function updateAlarmLight(alarmRows) {
+            const alarmLight = document.getElementById("light-alarm");
+            if (!alarmLight) return;
+            const rows = Array.isArray(alarmRows) ? alarmRows : [];
+            const dgAlarm = rows.find(item => (item.dg_name || "").trim() === TARGET_DG_NAME);
+            alarmLight.classList.toggle("active", String(dgAlarm?.alarm || "").trim().toUpperCase() === "ON");
+        }
+
         function updateDigitalTable(data) {
             const leftTbody = document.getElementById("digital-value-tbody-left");
             const rightTbody = document.getElementById("digital-value-tbody-right");
@@ -743,13 +794,21 @@
             const half = Math.ceil(DIGITAL_FIXED_POINTS.length / 2);
             const leftPoints = DIGITAL_FIXED_POINTS.slice(0, half);
             const rightPoints = DIGITAL_FIXED_POINTS.slice(half);
+            const greenStatusLabels = new Set(["ENGINE RUN", "READY TO START"]);
 
             function renderPoints(points, tbody) {
                 points.forEach(point => {
                     const tr = document.createElement("tr");
                     const hasValue = valueByLabel.has(point.label);
                     const rawValue = hasValue ? valueByLabel.get(point.label) : "";
-                    const value = rawValue == null ? "" : String(rawValue);
+                    let value = rawValue == null ? "" : String(rawValue);
+                    if (hasValue) {
+                        if (isOnValue(rawValue)) {
+                            value = "ON";
+                        } else if (String(rawValue).trim() === "0" || Number(rawValue) === 0) {
+                            value = "OFF";
+                        }
+                    }
 
                     const labelTd = document.createElement("td");
                     labelTd.textContent = point.label;
@@ -758,7 +817,9 @@
                     const valueTd = document.createElement("td");
                     valueTd.textContent = value;
                     if (hasValue && isOnValue(rawValue)) {
-                        valueTd.classList.add("digital-on");
+                        valueTd.classList.add(
+                            greenStatusLabels.has(point.label) ? "digital-status-on" : "digital-on"
+                        );
                     }
                     tr.appendChild(valueTd);
 
@@ -781,7 +842,7 @@
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-                const [analogResponse, digitalResponse] = await Promise.all([
+                const [analogResponse, digitalResponse, alarmResponse] = await Promise.all([
                     fetch("http://localhost:8000/api/live/analog_lable_value", {
                         signal: controller.signal,
                         cache: "no-store"
@@ -789,20 +850,27 @@
                     fetch("http://localhost:8000/api/live/live_digital_value", {
                         signal: controller.signal,
                         cache: "no-store"
+                    }),
+                    fetch("http://localhost:8000/api/alarms/dg_status", {
+                        signal: controller.signal,
+                        cache: "no-store"
                     })
                 ]);
                 clearTimeout(timeoutId);
                 if (!analogResponse.ok) throw new Error(`Analog API error: ${analogResponse.status}`);
                 if (!digitalResponse.ok) throw new Error(`Digital API error: ${digitalResponse.status}`);
+                if (!alarmResponse.ok) throw new Error(`Alarm API error: ${alarmResponse.status}`);
 
-                const [analogData, digitalData] = await Promise.all([
+                const [analogData, digitalData, alarmData] = await Promise.all([
                     analogResponse.json(),
-                    digitalResponse.json()
+                    digitalResponse.json(),
+                    alarmResponse.json()
                 ]);
 
                 updateUI(analogData);
                 updateDigitalTable(digitalData);
                 updateHeaderLights(digitalData);
+                updateAlarmLight(alarmData);
                 consecutiveFailures = 0;
             } catch (error) {
                 console.error("Fetch error:", error);
@@ -812,6 +880,7 @@
                     if (statusMsg) statusMsg.style.opacity = '1';
                 }
                 updateHeaderLights([]);
+                updateAlarmLight([]);
             } finally {
                 isFetching = false;
             }
